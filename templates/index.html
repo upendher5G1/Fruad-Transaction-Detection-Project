@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Fraud Detection System</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            padding-top: 30px;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .dashboard {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .box {
+            flex: 1;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        canvas {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 30px;
+        }
+
+        a {
+            color: cyan;
+        }
+        .charts-container{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+        gap:25px;
+        margin-top:40px;
+        }
+
+        .chart-box{
+         background:#1e293b;
+        padding:25px;
+        border-radius:20px;
+        box-shadow:0px 0px 20px rgba(0,0,0,0.4);
+        }
+
+        .chart-box h2{
+        text-align:center;
+        margin-bottom:20px;
+        color:#38bdf8;
+        }
+
+        canvas{
+        background:#0f172a;
+        border-radius:15px;
+        padding:10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="title">
+        <h1>AI-Powered Fraud Detection System</h1>
+        <p>Real-Time Banking Transaction Monitoring</p>
+    </div>
+
+    <div class="card">
+
+        <form action="/predict" method="POST">
+
+            <label>Transaction Amount</label>
+            <input type="number" name="amount" required>
+
+            <label>Old Balance</label>
+            <input type="number" name="oldbalance" required>
+
+            <label>New Balance</label>
+            <input type="number" name="newbalance" required>
+
+            <label>Transaction Type</label>
+
+            <select name="transaction_type">
+                <option value="TRANSFER">TRANSFER</option>
+                <option value="PAYMENT">PAYMENT</option>
+            </select>
+
+            <button type="submit">
+                Analyze Transaction
+            </button>
+
+        </form>
+
+        <div class="result">
+
+            <h2>{{ prediction_text }}</h2>
+
+            {% if risk_score %}
+                <h3>Risk Score: {{ risk_score }}%</h3>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="dashboard">
+
+        <div class="box">
+            <h2>99.2%</h2>
+            <p>Model Accuracy</p>
+        </div>
+
+        <div class="box">
+            <h2>24/7</h2>
+            <p>Real-Time Monitoring</p>
+        </div>
+
+        <div class="box">
+            <h2>AI Enabled</h2>
+            <p>Fraud Analytics</p>
+        </div>
+
+    </div>
+
+    <div class="charts-container">
+
+        <div class="chart-box">
+            <h2>Fraud Detection Overview</h2>
+            <canvas id="fraudPieChart"></canvas>
+        </div>
+        
+        <div class="chart-box">
+            <h2>Monthly Fraud Analysis</h2>
+            <canvas id="fraudLineChart"></canvas>
+        </div>
+        
+        <div class="chart-box">
+            <h2>Transaction Monitoring</h2>
+            <canvas id="fraudBarChart"></canvas>
+        </div>
+
+    </div>
+    <br><br>
+
+    <center>
+        <a href="/history">View Transaction History</a>
+    </center>
+
+</div>
+
+<script>
+
+Chart.defaults.color = "white";
+Chart.defaults.font.size = 14;
+
+//
+// PIE CHART
+//
+
+const pieCtx = document.getElementById('fraudPieChart');
+
+new Chart(pieCtx, {
+
+    type: 'doughnut',
+
+    data: {
+        labels: ['Fraud Transactions', 'Safe Transactions'],
+        datasets: [{
+            data: [18, 82],
+            backgroundColor: [
+                '#ef4444',
+                '#22c55e'
+            ],
+            borderWidth: 2
+        }]
+    },
+
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+
+});
+
+
+//
+// LINE CHART
+//
+
+const lineCtx = document.getElementById('fraudLineChart');
+
+new Chart(lineCtx, {
+
+    type: 'line',
+
+    data: {
+
+        labels: [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun'
+        ],
+
+        datasets: [{
+
+            label: 'Fraud Cases',
+
+            data: [12, 19, 7, 15, 10, 22],
+
+            borderColor: '#38bdf8',
+
+            backgroundColor: 'rgba(56,189,248,0.2)',
+
+            fill: true,
+
+            tension: 0.4,
+
+            pointBackgroundColor: '#38bdf8',
+
+            pointRadius: 5
+
+        }]
+    },
+
+    options: {
+
+        responsive: true,
+
+        scales: {
+
+            y: {
+                beginAtZero: true
+            }
+
+        }
+
+    }
+
+});
+
+
+//
+// BAR CHART
+//
+
+const barCtx = document.getElementById('fraudBarChart');
+
+new Chart(barCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            'Transfer',
+            'Payment',
+            'Cash Out',
+            'Debit',
+            'Credit'
+        ],
+
+        datasets: [{
+
+            label: 'Suspicious Transactions',
+
+            data: [45, 25, 60, 15, 10],
+
+            backgroundColor: [
+                '#3b82f6',
+                '#22c55e',
+                '#ef4444',
+                '#eab308',
+                '#a855f7'
+            ],
+
+            borderRadius: 10
+
+        }]
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+                display: false
+            }
+
+        },
+
+        scales: {
+
+            y: {
+                beginAtZero: true
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
